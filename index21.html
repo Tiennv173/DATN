@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+
+  <head>
+    <title>Smart Pump -Admin</title>
+    <!-- <link rel="icon" type="image/ico" href="./public/images/logo.png" /> -->
+    <script type="text/javascript" src="./node_modules/zingchart/client/zingchart.min.js"></script>
+    <script src="https://cdn.zingchart.com/zingchart.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  </head>
+
+
+  <body>
+    <script>
+      // Generates GET requests to a URL.
+    function httpGet(Url){
+      var xmlHttp = new XMLHttpRequest();
+      xmlHttp.open("GET", Url, false);
+      xmlHttp.send(null);
+      return xmlHttp.responseText;
+    }
+    window.onload=function(){
+
+      // GET request to localhost:3000/test, which has been configured to send back our db data
+      var aData = JSON.parse(httpGet('http://localhost:3000'));
+
+      // var y = data;
+      // document.getElementById("test").innerHTML = y;
+      
+      var dataLength = 20; // number of dataPoints visible at any point
+      var timeStep = 900000; //time step
+      var updateInterval = 90000; //time interval
+
+      var seriesData = {
+        hum: [],
+        temp: [],
+        humk: [],
+        lux: []
+      };
+      var z = aData[2]['param']['hum']
+      document.getElementById("test").innerHTML = [typeof(z),z];
+
+      // Push the data into the seriesData object's arrays.
+      
+      for(var n = 0; n < dataLength; n++) {
+            seriesData['hum'].push(aData[n].param.hum);
+            seriesData['temp'].push(aData[n]['param']['temp']);
+            seriesData['humk'].push(aData[n]['param']['humk']);
+            seriesData['lux'].push(aData[n]['param']['lux']);
+        };
+
+      var updateChart = function() {
+
+      // Render the chart using the data from Mongo
+        zingchart.render({
+        id:"myChart",
+        width:"100%",
+        height:'50%',
+        data:{
+          "type":"line",
+          "title":{
+            "text":"Dynamic Humidity"
+          },
+          "plot":{
+            "line-width":1,
+            "aspect":"segmented",
+            "marker":{
+              "visible":false
+            }
+          },
+          "scale-x": {
+            "min-value": new Date().getTime()-(timeStep*(dataLength-1)),
+                "shadow": 0,
+                "step": timeStep,
+                "transform": {
+                    "type": "date",
+                    "all": "%D, %d %M<br />%h:%i %A",
+                    "guide": {
+                        "visible": false
+                    },
+                    "item": {
+                        "visible": false
+                    }}
+          },
+          "series":[
+            {
+              "values":seriesData['hum'],
+              "text": "Humidity",
+              "line-color": "#007790",
+              "legend-item":{
+                "background-color": "#007790",
+                "borderRadius":5,
+                 "font-color":"white"}
+            },
+            {
+              "values":seriesData['temp']
+            },
+            {
+              "values":seriesData['humk']
+            },
+            {
+              "values":seriesData['lux']
+            }
+
+          ]
+        }
+      });
+        // dataLength++;
+        // seriesData['series_0'].push(aData[dataLength]['series0']);
+        // seriesData['series_1'].push(aData[dataLength]['series1']);
+        // seriesData['series_2'].push(aData[dataLength]['series2']);
+        // seriesData['series_3'].push(aData[dataLength]['series3']);
+        // seriesData['series_0'].shift();
+        // seriesData['series_1'].shift();
+        // seriesData['series_2'].shift();
+        // seriesData['series_3'].shift();
+
+      }
+    updateChart();
+    
+    setInterval(function(){updateChart()}, updateInterval);
+
+    };
+
+    </script>
+    <h1>Dashboard</h1>
+    <div id="myChart"></div>
+    <div id="test">
+      
+    </div>
+  </body>
+</html>
