@@ -12,7 +12,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
 // sets view forlder
-// app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, 'views'));
 
 //sets view engine
 // app.set('view engine', 'ejs');
@@ -31,7 +31,7 @@ app.get('/', function (req, res) {
 		if(err) throw err;
 		const dbo = db.db("device");
 		const col = dbo.collection('data');
-		col.find({}).sort({_id: -1}).limit(48).toArray().then(docs => {
+		col.find({}).sort({_id: -1}).limit(20).toArray().then(docs => {
 			console.log('found data for index');
 			// console.log(docs);
 			//res index.html 

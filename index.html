@@ -12,7 +12,8 @@
 
 </head>
 <body>
-  <h1 id="abc">Dashboard</h1>
+  <div class="test2"></div>
+  <h1 id="abc" class="text-align: center">Web Page Analyzer</h1>
   <div class="container-fluid">
 
       <div id="myChart"></div>
@@ -21,6 +22,8 @@
         <div class="badge badge-info">Huminity</div>
         <div class="badge badge-danger">Temperature</div>
         <div class="badge badge-success">Humk</div>
+    </div>
+    <div id="myChart_lux" class="mt-5">
     </div>
   </div>
     <!-- <div id="test1"></div> -->
@@ -37,7 +40,9 @@
   //      $("#abc").blink();
     // });
 
-    var fetchParams = {
+    var updateInterval = 300000;
+    var update = function(){
+      var fetchParams = {
       method: "GET",
       // mode: "cors",
       // cache: "default"
@@ -46,7 +51,7 @@
     var url = "http://localhost:3000/";
 
     fetch(url, fetchParams).then(res => {
-      return res.json();
+      return res.text();
 
       var x = res.json();
       document.getElementById("test1").innerHTML = x;
@@ -54,7 +59,7 @@
       //-> return [object Response]
     })
     .then(data => {
-      var aData = data;
+      var aData = JSON.parse(data);
 
       // var y = data;
       // document.getElementById("test2").innerHTML = y;
@@ -63,96 +68,44 @@
               hum: [],
               temp: [],
               humk: [],
-              lux: []
+              lux: [],
+              timescale: []
       };
 
       // var z = aData[100]['param']['hum'];
       // document.getElementById("test2").innerHTML = [typeof(z),z];
-
-        var dataLength = 48; // number of dataPoints visible at any point
+        var dataLength = 20; // number of dataPoints visible at any point
         var updateInterval = 6000; //time interval
         var timeStep = 1800000;
-
 
       for(var n = 0; n < dataLength; n++) {
             seriesData['hum'].push(aData[n].param.hum);
             seriesData['temp'].push(aData[n]['param']['temp']);
             seriesData['humk'].push(aData[n]['param']['humk']);
             seriesData['lux'].push(aData[n]['param']['lux']);
+            seriesData['timescale'].push(aData[n].date)
         };
       
     
+      
 
 
     var updateChart = function() {
 
-      // Render the chart using the data from Mongo
-        zingchart.render({
-        id:"myChart",
-        width:"100%",
-        height:500,
-        data:{
-          "type":"line",
-          "title":{
-            "text":"Dynamic Humidity"
+        var myConfig = {
+          "type": "line",
+          "tittle": {
+            "text": "Web Page Analyzer"
           },
-          "plot":{
-            "line-width":1,
-            "aspect":"segmented",
-            "marker":{
-              "visible":false
-            }
+          "plotarea": {
+            "adjust-layout": true
           },
           "scale-x": {
-            "min-value": new Date().getTime()-(timeStep*(dataLength-1)),
-                "shadow": 0,
-                "step": timeStep,
-                "transform": {
-                    "type": "date",
-                    "all": "%D, %d %M<br />%h:%i %A",
-                    "guide": {
-                        "visible": false
-                    },
-                    "item": {
-                        "visible": false
-                    }}
+            "labels": [seriesData['timescale']]
           },
-          "scale-y": {
-                "values": "0:90:10",
-                "line-color": "#f6f7f8",
-                "shadow": 0,
-                "guide": {
-                    "line-style": "dashed"
-                },
-                "label": {
-                    "text": "Humidity (%)",
-                },
-                "minor-ticks": 0,
-                "thousands-separator": ","
-            },
           "series":[
             {
-              "values":seriesData['hum'],
-              "text": "Documentation",
-                    "line-color": "#009872",
-                    "legend-item":{
-                      "background-color": "#009872",
-                      "borderRadius":5,
-                       "font-color":"white"
-                    },
-                    "legend-marker": {
-                        "visible":false
-                    },
-                    "marker": {
-                        "background-color": "#009872",
-                        "border-width": 1,
-                        "shadow": 0,
-                        "border-color": "#69f2d0"
-                    },
-                    "highlight-marker":{
-                      "size":6,
-                      "background-color": "#009872",
-                    }
+              "values":seriesData['hum']
             },
             {
               "values":seriesData['temp']
@@ -160,28 +113,51 @@
             {
               "values":seriesData['humk']
             },
-            // {
-            //   "values":seriesData['lux']
-            // }
-
           ]
-        }
+        };
+      // Render the chart using the data from Mongo
+        zingchart.render({
+        id:"myChart",
+        width:"100%",
+        height:500,
+        data: myConfig
       });
-        // dataLength++;
-        // seriesData['series_0'].push(aData[dataLength]['series0']);
-        // seriesData['series_1'].push(aData[dataLength]['series1']);
-        // seriesData['series_2'].push(aData[dataLength]['series2']);
-        // seriesData['series_3'].push(aData[dataLength]['series3']);
-        // seriesData['series_0'].shift();
-        // seriesData['series_1'].shift();
-        // seriesData['series_2'].shift();
-        // seriesData['series_3'].shift();
+      };
+    var updateChart2 = function() {
 
-      }
+        let myConfig = {
+          "type": "line",
+          "tittle": {
+            "text": "Web Page Analyzer"
+          },
+          "plotarea": {
+            "adjust-layout": true
+          },
+          "scale-x": {
+            "labels": [seriesData['timescale']]
+          },
+          "series":[
+            {
+              "values":seriesData['lux']
+            }
+          ]
+        };
+      // Render the chart using the data from Mongo
+        zingchart.render({
+        id:"myChart_lux",
+        width:"100%",
+        height:500,
+        data: myConfig
+      });
+      };
+
     updateChart();
-
+    updateChart2();
 
     });
+    };
+
+    setInterval(update(), 60000);
     
   </script>
 </body>
