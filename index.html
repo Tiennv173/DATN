@@ -68,9 +68,10 @@
               hum: [],
               temp: [],
               humk: [],
-              lux: [],
-              timescale: []
+              lux: []
       };
+       
+      var timescale = [];
 
       // var z = aData[100]['param']['hum'];
       // document.getElementById("test2").innerHTML = [typeof(z),z];
@@ -83,7 +84,8 @@
             seriesData['temp'].push(aData[n]['param']['temp']);
             seriesData['humk'].push(aData[n]['param']['humk']);
             seriesData['lux'].push(aData[n]['param']['lux']);
-            seriesData['timescale'].push(aData[n].date)
+            // seriesData['timescale'].push((aData[n].date.hour).toString();
+            timescale[n] = aData[n].date.hour;
         };
       
     
@@ -101,7 +103,7 @@
             "adjust-layout": true
           },
           "scale-x": {
-            "labels": [seriesData['timescale']]
+            "labels": timescale
           },
           "series":[
             {
@@ -137,7 +139,7 @@
             "label": {
               "text": "lux"
             },
-            "labels": [seriesData['timescale']]
+            "labels": timescale
           },
           "series":[
             {
